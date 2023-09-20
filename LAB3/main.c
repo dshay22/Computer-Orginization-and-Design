@@ -3,11 +3,11 @@
 #define FRAME_WIDTH 16
 #define WINDOW_WIDTH 4
 
-int SumOfDifference(int f[FRAME_WIDTH][FRAME_WIDTH], int w[WINDOW_WIDTH][WINDOW_WIDTH], int windowSize, int frameStartRow, int frameStartCol){
+int SumOfDifference(int f[FRAME_WIDTH][FRAME_WIDTH], int w[WINDOW_WIDTH][WINDOW_WIDTH], int windowRow, int windowCol, int frameStartRow, int frameStartCol){
     int sumOfDiff = 0;
 
-    for(int i = 0; i <  windowSize; ++i){//moves through rows
-        for(int j = 0; j < windowSize; ++j){//moves through cols
+    for(int i = 0; i <  windowRow; ++i){//moves through rows
+        for(int j = 0; j < windowCol; ++j){//moves through cols
             sumOfDiff += abs(w[i][j] - f[i + frameStartRow][j + frameStartCol]);
         }
     }
@@ -15,16 +15,20 @@ int SumOfDifference(int f[FRAME_WIDTH][FRAME_WIDTH], int w[WINDOW_WIDTH][WINDOW_
     return sumOfDiff;
 }
 
-void everything(int* x, int* y, int frame[FRAME_WIDTH][FRAME_WIDTH], int window[WINDOW_WIDTH][WINDOW_WIDTH]){
+void everything(int* x, int* y, int frame[FRAME_WIDTH][FRAME_WIDTH], int window[WINDOW_WIDTH][WINDOW_WIDTH], int aSize[4]){
     int tempDiff, minDiff;
     int row = 0, col = 0;
+    int windowRow = aSize[2];
+    int windowCol = aSize[3];
+    int frameRow = aSize[0];
+    int frameCol = aSize[1];
     //printf("%d, %d\n", x, y);
-    minDiff = SumOfDifference(frame, window, WINDOW_WIDTH, row, col);
+    minDiff = SumOfDifference(frame, window, windowRow, windowCol, row, col);
 
-    for (int i = 0; i < (FRAME_WIDTH / 2) - (WINDOW_WIDTH / 2); ++i) {
+    for (int i = 0; i < (frameRow / 2) - (windowCol / 2); ++i) {
         ++row;
         //printf("%d, %d\n", x, y);
-        tempDiff = SumOfDifference(frame, window, WINDOW_WIDTH, row, col);
+        tempDiff = SumOfDifference(frame, window, windowRow, windowCol, row, col);
         if(tempDiff < minDiff){
             *y = col;
             *x = row;
@@ -34,7 +38,7 @@ void everything(int* x, int* y, int frame[FRAME_WIDTH][FRAME_WIDTH], int window[
             --row;
             ++col;
             //printf("%d, %d\n", x, y);
-            tempDiff = SumOfDifference(frame, window, WINDOW_WIDTH, row, col);
+            tempDiff = SumOfDifference(frame, window, windowRow, windowCol, row, col);
             if(tempDiff < minDiff){
                 *y = col;
                 *x = row;
@@ -43,7 +47,7 @@ void everything(int* x, int* y, int frame[FRAME_WIDTH][FRAME_WIDTH], int window[
         }
         ++col;
         //printf("%d, %d\n", x, y);
-        tempDiff = SumOfDifference(frame, window, WINDOW_WIDTH, row, col);
+        tempDiff = SumOfDifference(frame, window, windowRow, windowCol, row, col);
         if(tempDiff < minDiff){
             *y = col;
             *x = row;
@@ -53,7 +57,7 @@ void everything(int* x, int* y, int frame[FRAME_WIDTH][FRAME_WIDTH], int window[
             ++row;
             --col;
             //printf("%d, %d\n", x, y);
-            tempDiff = SumOfDifference(frame, window, WINDOW_WIDTH, row, col);
+            tempDiff = SumOfDifference(frame, window, windowRow, windowCol, row, col);
             if(tempDiff < minDiff){
                 *y = col;
                 *x = row;
@@ -63,20 +67,20 @@ void everything(int* x, int* y, int frame[FRAME_WIDTH][FRAME_WIDTH], int window[
     }
     //printf("\nHALF\n\n");
     --row;
-    for (int i = 0; i < (FRAME_WIDTH / 2) - (WINDOW_WIDTH / 2); ++i) {
+    for (int i = 0; i < (frameRow / 2) - (windowRow / 2); ++i) {
         ++row; 
         //printf("%d, %d\n", x, y);
-        tempDiff = SumOfDifference(frame, window, WINDOW_WIDTH, row, col);
+        tempDiff = SumOfDifference(frame, window, windowRow, windowCol, row, col);
         if(tempDiff < minDiff){
             *y = col;
             *x = row;
             minDiff = tempDiff;
         }
-        while (row != 12) {
+        while (row < frameRow - windowRow) {
             ++row;
             --col;
             //printf("%d, %d\n", x, y);
-            tempDiff = SumOfDifference(frame, window, WINDOW_WIDTH, row, col);
+            tempDiff = SumOfDifference(frame, window, windowRow, windowCol, row, col);
             if(tempDiff < minDiff){
                 *y = col;
                 *x = row;
@@ -85,17 +89,17 @@ void everything(int* x, int* y, int frame[FRAME_WIDTH][FRAME_WIDTH], int window[
         }
         ++col;
         //printf("%d, %d\n", x, y);
-        tempDiff = SumOfDifference(frame, window, WINDOW_WIDTH, row, col);
+        tempDiff = SumOfDifference(frame, window, windowRow, windowCol, row, col);
         if(tempDiff < minDiff){
             *y = col;
             *x = row;
             minDiff = tempDiff;
         }
-        while (col != 12) {
+        while (col < frameCol - windowCol) {
             --row;
             ++col;
             //printf("%d, %d\n", x, y);
-            tempDiff = SumOfDifference(frame, window, WINDOW_WIDTH, row, col);
+            tempDiff = SumOfDifference(frame, window, windowRow, windowCol, row, col);
             if(tempDiff < minDiff){
                 *y = col;
                 *x = row;
@@ -106,7 +110,7 @@ void everything(int* x, int* y, int frame[FRAME_WIDTH][FRAME_WIDTH], int window[
     }
     ++row;
     //printf("%d, %d\n", x, y);
-    tempDiff = SumOfDifference(frame, window, WINDOW_WIDTH, row, col);
+    tempDiff = SumOfDifference(frame, window, windowRow, windowCol, row, col);
     if(tempDiff < minDiff){
         *y = col;
         *x = row;
@@ -171,11 +175,41 @@ int main()
                                                 {7,7,7,7}
                                                };
 
+    int frame3[FRAME_WIDTH][FRAME_WIDTH] = {
+                                            {7, 8, 8, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},//0
+                                            {7, 8, 8, 8, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15},//1
+                                            {7, 8, 8, 8, 2, 8, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30},//2
+                                            {7, 8, 8, 8, 8, 8, 18, 21, 24, 27, 30, 33, 36, 39, 42, 45},//3
+                                            {0, 4, 8, 8, 8, 8, 24, 28, 32, 36, 40, 44, 48, 52, 56, 60},//4
+                                            {0, 5, 8, 8, 8, 8, 30, 35, 40, 45, 50, 55, 60, 65, 70,  75},//5
+                                            {0, 6, 8, 8, 8, 8, 36, 42, 48, 54, 60, 66, 72, 78, 84, 90},//6
+                                            {0, 4, 8, 8, 8, 8, 42, 49, 56, 63, 70, 77, 84, 91, 98, 105},//7
+                                            {0, 1, 8, 8, 8, 8, 48, 56, 64, 72, 80, 88, 96, 104, 112, 120},//8
+                                            {0, 1, 8, 8, 8, 8, 54, 63, 72, 81, 90, 99, 108, 117, 126, 135},//9
+                                            {0, 10, 8, 8, 8, 8, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150},//10
+                                            {0,  11,  22,  33,  44,  55,  66,  77,  88,  99, 110, 121, 132, 143, 154, 165},//11
+                                            {9, 9, 9, 9, 48, 60, 72, 84, 96, 108, 120, 132, 0, 1, 2, 3},//12
+                                            {9, 9, 9, 9, 52, 65, 78, 91, 104, 114, 130, 143, 1, 2, 3, 4},//13
+                                            {9, 9, 9, 9, 56, 70, 84, 98, 112, 126, 140, 154, 2, 3, 4, 5},//14
+                                            {9, 9, 9, 9, 60, 75, 90, 105, 120, 135, 150, 165, 3, 4, 5, 6} //15
+                                           };
+        
+        int window3 [8][4] = {
+                                {8, 8, 8, 8},
+                                {8, 8, 8, 8},
+                                {8, 8, 8, 8},
+                                {8, 8, 8, 8},
+                                {8, 8, 8, 8},
+                                {8, 8, 8, 8},
+                                {8, 8, 8, 8},
+                                {8, 8, 8, 8}
+                             };
+
     int x;
     int y;
-    int asize[] = {15,15,4,4};
+    int asize[] = {16,16,8,4};
 
-    everything(&x, &y, frame2, window2);
+    everything(&y, &x, frame3, window3, asize);
 
     printf("%d %d", x, y);
     
